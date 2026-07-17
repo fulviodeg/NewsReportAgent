@@ -22,8 +22,10 @@ from .ingest.base import RawMessage
 
 # Links whose text or href match these are boilerplate, not news items.
 _SKIP = re.compile(
-    r"unsubscribe|disiscriv|preferenc|privacy|cookie|view (this|in)|"
-    r"in browser|twitter|facebook|linkedin|instagram|mailto:|t\.me/",
+    r"unsubscribe|disiscriv|annulla|iscrizione|cancellati|preferenc|privacy|cookie|"
+    r"view (this|in)|in browser|view online|advertise|sponsor|"
+    r"clicca qui|sito web|shop now|acquista|apri la mappa|scarica l'app|download the app|"
+    r"twitter|facebook|linkedin|instagram|mailto:|t\.me/",
     re.IGNORECASE,
 )
 _HTTP = re.compile(r"^https?://", re.IGNORECASE)

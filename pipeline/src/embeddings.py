@@ -37,14 +37,22 @@ class OpenAICompatibleEmbeddings(EmbeddingsProvider):
         api_key: str,
         client: Optional[httpx.Client] = None,
         timeout: float = 30.0,
+        batch_size: int = 8,
     ):
         self.endpoint = endpoint
         self.model = model
         self.api_key = api_key
         self._client = client
         self._timeout = timeout
+        self.batch_size = batch_size
 
     def embed(self, texts: list[str]) -> list[list[float]]:
+        vectors: list[list[float]] = []
+        for start in range(0, len(texts), self.batch_size):
+            vectors.extend(self._embed_batch(texts[start : start + self.batch_size]))
+        return vectors
+
+    def _embed_batch(self, texts: list[str]) -> list[list[float]]:
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",

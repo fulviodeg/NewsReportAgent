@@ -37,6 +37,7 @@ class Embeddings(BaseModel):
     provider: str
     model: str
     endpoint: str
+    batch_size: int = 8
 
 
 class Clustering(BaseModel):

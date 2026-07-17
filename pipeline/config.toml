@@ -21,6 +21,7 @@ max_consecutive_failures = 5        # circuit breaker: abort run after N in a ro
 provider = "openrouter"
 model = "openai/text-embedding-3-small"
 endpoint = "https://openrouter.ai/api/v1/embeddings"
+batch_size = 8   # texts per request; keep modest behind proxies that cap payload size
 
 [clustering]
 similarity_threshold = 0.82
@@ -40,6 +41,13 @@ themes = ["AI", "Fintech", "Cybersecurity", "Startup", "Policy/Regulation", "Big
 refresh_seconds = 60
 
 [[sources]]
-name = "Example Testata"
-from_address = "news@example.com"
-# parse_hint = "css-selector-or-rule"   # optional per-sender hint
+name = "TLDR"
+from_address = "dan@tldrnewsletter.com"
+parse_hint = "div.text-block"   # digest format: one story per text-block
+
+[[sources]]
+name = "Internazionale"
+from_address = "newsletter@internazionale.it"
+# Editorial format (Mailchimp, inline links) — the generic splitter over-extracts here.
+# Best treated as a single item; a per-sender "whole email" mode is a future refinement.
+

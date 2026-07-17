@@ -161,7 +161,10 @@ def main() -> None:
         # present, otherwise fall back to the deterministic demo embeddings for clustering.
         if secrets.embeddings_api_key:
             provider = OpenAICompatibleEmbeddings(
-                config.embeddings.endpoint, config.embeddings.model, secrets.embeddings_api_key
+                config.embeddings.endpoint,
+                config.embeddings.model,
+                secrets.embeddings_api_key,
+                batch_size=config.embeddings.batch_size,
             )
             print(f"REAL mode: LLM={config.llm.model_synthesize}, embeddings={config.embeddings.model}")
         else:

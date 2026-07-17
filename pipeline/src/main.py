@@ -216,7 +216,10 @@ def _build_context(config: AppConfig, secrets, data_dir: str):
     conn = db.connect(os.path.join(data_dir, "news.db"))
     db.init_schema(conn)
     provider = OpenAICompatibleEmbeddings(
-        config.embeddings.endpoint, config.embeddings.model, secrets.embeddings_api_key or ""
+        config.embeddings.endpoint,
+        config.embeddings.model,
+        secrets.embeddings_api_key or "",
+        batch_size=config.embeddings.batch_size,
     )
     llm = LLMClient(
         config.llm.endpoint,
