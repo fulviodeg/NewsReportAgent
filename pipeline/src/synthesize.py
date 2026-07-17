@@ -11,7 +11,7 @@ import sqlite3
 
 from pydantic import ValidationError
 
-from .llm import CostTracker, ItemProcessingError, LLMClient
+from .llm import CostTracker, ItemProcessingError, LLMClient, extract_json
 from .models import Synthesis
 
 _SYSTEM = (
@@ -49,7 +49,7 @@ def synthesize_cluster(
         res = llm.complete(model, messages)
         tracker.add(res.cost)
         try:
-            return Synthesis.model_validate_json(res.content)
+            return Synthesis.model_validate_json(extract_json(res.content))
         except ValidationError as exc:
             last_err = exc
             continue

@@ -13,6 +13,7 @@ Cost is read from the response `usage.cost` when the provider returns it (0.0 ot
 from __future__ import annotations
 
 import random
+import re
 import time
 from dataclasses import dataclass, field
 from typing import Callable, Optional
@@ -20,6 +21,23 @@ from typing import Callable, Optional
 import httpx
 
 TRANSIENT_STATUS = {429, 500, 502, 503, 504}
+
+
+def extract_json(text: str) -> str:
+    """Best-effort extraction of a JSON object from an LLM response.
+
+    Real models often wrap JSON in ```json fences or add surrounding prose; strip fences
+    and fall back to the first '{' .. last '}' span so validation sees clean JSON.
+    """
+    t = text.strip()
+    if t.startswith("```"):
+        t = re.sub(r"^```[a-zA-Z0-9]*\n?", "", t)
+        t = re.sub(r"\n?```$", "", t).strip()
+    if not t.startswith("{"):
+        start, end = t.find("{"), t.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            t = t[start : end + 1]
+    return t
 
 
 class LLMError(Exception):

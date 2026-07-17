@@ -13,7 +13,7 @@ import sqlite3
 
 from pydantic import ValidationError
 
-from .llm import CostTracker, ItemProcessingError, LLMClient
+from .llm import CostTracker, ItemProcessingError, LLMClient, extract_json
 from .models import Classification
 
 _SYSTEM = "You are a precise news classifier. Respond ONLY with a single JSON object."
@@ -49,7 +49,7 @@ def classify_cluster(
         res = llm.complete(model, messages)
         tracker.add(res.cost)
         try:
-            parsed = Classification.model_validate_json(res.content)
+            parsed = Classification.model_validate_json(extract_json(res.content))
         except ValidationError as exc:
             last_err = exc
             continue

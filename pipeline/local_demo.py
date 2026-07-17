@@ -151,16 +151,26 @@ def main() -> None:
     if real:
         _load_dotenv(REPO / ".env")
         secrets = load_secrets()
-        provider = OpenAICompatibleEmbeddings(
-            config.embeddings.endpoint, config.embeddings.model, secrets.embeddings_api_key or ""
-        )
         llm = LLMClient(
             config.llm.endpoint,
             secrets.openrouter_api_key,
             max_retries=config.llm.max_retries,
             backoff_base=config.llm.backoff_base_seconds,
         )
-        print("Running in REAL mode (OpenRouter + embeddings API).")
+        # OpenRouter serves chat completions only; use a real embeddings API when a key is
+        # present, otherwise fall back to the deterministic demo embeddings for clustering.
+        if secrets.embeddings_api_key:
+            provider = OpenAICompatibleEmbeddings(
+                config.embeddings.endpoint, config.embeddings.model, secrets.embeddings_api_key
+            )
+            print(f"REAL mode: LLM={config.llm.model_synthesize}, embeddings={config.embeddings.model}")
+        else:
+            provider = DemoEmbeddings()
+            config.clustering.similarity_threshold = 0.6
+            print(
+                f"REAL mode: LLM={config.llm.model_synthesize} (real), "
+                "embeddings=demo fallback (no EMBEDDINGS_API_KEY set)"
+            )
     else:
         provider = DemoEmbeddings()
         llm = DemoLLM()

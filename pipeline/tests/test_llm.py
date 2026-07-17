@@ -1,7 +1,20 @@
 import httpx
 import pytest
 
-from src.llm import CostCapExceeded, CostTracker, LLMClient, LLMError
+from src.llm import CostCapExceeded, CostTracker, LLMClient, LLMError, extract_json
+
+
+def test_extract_json_plain():
+    assert extract_json('{"a": 1}') == '{"a": 1}'
+
+
+def test_extract_json_strips_code_fences():
+    assert extract_json('```json\n{"a": 1}\n```') == '{"a": 1}'
+    assert extract_json('```\n{"a": 1}\n```') == '{"a": 1}'
+
+
+def test_extract_json_strips_surrounding_prose():
+    assert extract_json('Sure, here it is:\n{"a": 1}\nHope that helps') == '{"a": 1}'
 
 
 def _client(handler):
