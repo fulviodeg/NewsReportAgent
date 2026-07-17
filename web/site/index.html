@@ -7,17 +7,21 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header>
-    <h1>News Report Agent</h1>
-    <div class="controls">
-      <input type="search" id="search" placeholder="Cerca…" />
-      <select id="filter-theme"><option value="">Tutti i temi</option></select>
-      <select id="filter-company"><option value="">Tutte le aziende</option></select>
-      <select id="filter-testata"><option value="">Tutte le testate</option></select>
-    </div>
-    <p id="status" class="status"></p>
+  <header class="topbar">
+    <div class="brand">News&nbsp;Report&nbsp;<span>Agent</span></div>
+    <input type="search" id="search" placeholder="Cerca notizie, aziende, fonti…" />
+    <span id="status" class="status"></span>
   </header>
-  <main id="stories"></main>
+
+  <nav id="tabs" class="tabs" aria-label="Filtra per tema"></nav>
+
+  <div class="subcontrols">
+    <select id="filter-company"><option value="">Tutte le aziende</option></select>
+    <select id="filter-testata"><option value="">Tutte le testate</option></select>
+  </div>
+
+  <main id="stories" class="grid"></main>
+
   <script src="app.js"></script>
 </body>
 </html>

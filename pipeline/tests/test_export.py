@@ -23,7 +23,7 @@ def _story(conn, sources, theme, companies, relevance, summary):
         ids.append(row["id"])
     cid = db.insert_cluster(conn, ids)
     db.set_classification(conn, cid, theme, companies, relevance)
-    db.set_synthesis(conn, cid, summary)
+    db.set_synthesis(conn, cid, f"Titolo {summary}", "Sottotitolo", summary, f"Lungo {summary}")
     return cid
 
 

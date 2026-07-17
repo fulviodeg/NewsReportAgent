@@ -36,9 +36,10 @@ class ScriptedLLM:
         if is_classify:
             return LLMResult('{"theme":"AI","companies":["Acme"],"relevance":0.7}', 0.001)
         if "grp2" in user:
-            return LLMResult('{"summary_it":"x","source_links":[]}', 0.001)  # invalid
+            return LLMResult('{"title":"x","subtitle":"y","summary_it":"z","summary_long":"w","source_links":[]}', 0.001)  # invalid
         return LLMResult(
-            '{"summary_it":"Sintesi in italiano con English terms","source_links":["https://a/1"]}',
+            '{"title":"Nuovo chip","subtitle":"Contesto","summary_it":"Sintesi breve",'
+            '"summary_long":"Approfondimento esteso con English terms","source_links":["https://a/1"]}',
             0.001,
         )
 
@@ -75,6 +76,9 @@ def test_processing_end_to_end_with_per_item_isolation(tmp_path):
     assert len(data["stories"]) == 1
     story = data["stories"][0]
     assert story["theme"] == "AI"
+    assert story["title"] == "Nuovo chip"
+    assert story["subtitle"]
+    assert story["summary_long"]
     assert {s["testata"] for s in story["sources"]} == {"Testata A", "Testata B"}
     assert data["themes"] == ["AI"]
 

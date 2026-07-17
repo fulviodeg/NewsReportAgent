@@ -58,7 +58,10 @@ class ScriptedLLM:
         if "classifier" in messages[0]["content"]:
             return LLMResult('{"theme":"AI","companies":["Apple"],"relevance":0.9}', 0.001)
         return LLMResult(
-            '{"summary_it":"Apple ha presentato un nuovo chip.","source_links":["https://a.example/apple"]}',
+            '{"title":"Apple presenta il chip M5","subtitle":"Nuovo processore on-device",'
+            '"summary_it":"Apple ha presentato un nuovo chip.",'
+            '"summary_long":"Apple ha presentato il chip M5 con miglioramenti AI on-device.",'
+            '"source_links":["https://a.example/apple"]}',
             0.001,
         )
 

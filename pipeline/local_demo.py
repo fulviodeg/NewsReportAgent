@@ -102,15 +102,24 @@ class DemoLLM:
                 0.0,
             )
         links = re.findall(r"https?://[^\s\]\"',)]+", content)
-        summary = self._summary(content)
         links_json = "[" + ", ".join(f'"{l}"' for l in dict.fromkeys(links)) + "]"
-        return LLMResult(f'{{"summary_it": "{summary}", "source_links": {links_json}}}', 0.0)
+        headline = self._headline(content)
+        return LLMResult(
+            f'{{"title": "{headline[:70]}", '
+            f'"subtitle": "[demo] sottotitolo di contesto", '
+            f'"summary_it": "[demo] Sintesi in italiano: {headline}", '
+            f'"summary_long": "[demo] Approfondimento: {headline}. '
+            f'Dettagli aggiuntivi e contesto della notizia.", '
+            f'"source_links": {links_json}}}',
+            0.0,
+        )
 
     @staticmethod
     def _guess_theme(text):
-        # scan only the story text (after the prompt's "Story items:" marker) with
-        # word-boundary matching, so the themes list in the prompt can't false-match.
-        part = text.split("Story items:")[-1].lower()
+        # scan only the story text (after the prompt's "Story items:" / "notizia:" marker)
+        # with word-boundary matching, so the themes list in the prompt can't false-match.
+        marker = "Elementi della notizia:" if "Elementi della notizia:" in text else "Story items:"
+        part = text.split(marker)[-1].lower()
         for theme, words in _THEME_KEYWORDS.items():
             if any(re.search(rf"\b{re.escape(w)}\b", part) for w in words):
                 return theme
@@ -125,12 +134,12 @@ class DemoLLM:
         return "[" + ", ".join(f'"{c}"' for c in found) + "]"
 
     @staticmethod
-    def _summary(text):
-        # first story line as a stand-in Italian summary (demo only)
+    def _headline(text):
         first = next((l for l in text.splitlines() if l.strip().startswith("- ")), "")
         first = re.sub(r"\s+", " ", first).strip("- ").strip()
-        first = first.replace('"', "'")[:220]
-        return f"[demo] Sintesi in italiano: {first}"
+        # drop the trailing "(url)" if present
+        first = re.sub(r"\s*\(https?://[^)]+\)\s*$", "", first)
+        return first.replace('"', "'")[:180] or "Notizia"
 
 
 def _load_dotenv(path: Path) -> None:

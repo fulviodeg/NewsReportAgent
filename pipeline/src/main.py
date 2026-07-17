@@ -158,7 +158,14 @@ def run_processing(
                 if consecutive >= max_consecutive:
                     raise _RunAborted("too many consecutive synthesize failures")
                 continue
-            db.set_synthesis(conn, cluster["id"], result.summary_it)
+            db.set_synthesis(
+                conn,
+                cluster["id"],
+                result.title,
+                result.subtitle,
+                result.summary_it,
+                result.summary_long,
+            )
             counts["synthesized"] += 1
             consecutive = 0
 

@@ -53,7 +53,7 @@ def test_cluster_lifecycle():
     db.set_classification(conn, cid, "AI", ["Acme"], 0.8)
     assert not db.clusters_needing_classification(conn)
     assert db.clusters_needing_synthesis(conn)[0]["id"] == cid
-    db.set_synthesis(conn, cid, "Sintesi in italiano")
+    db.set_synthesis(conn, cid, "Titolo", "Sottotitolo", "Sintesi in italiano", "Approfondimento")
     assert not db.clusters_needing_synthesis(conn)
     exp = db.exportable_clusters(conn, min_relevance=0.3)
     assert len(exp) == 1 and exp[0]["summary_it"] == "Sintesi in italiano"
@@ -63,7 +63,7 @@ def test_exportable_respects_min_relevance():
     conn = _fresh()
     cid = db.insert_cluster(conn, [1])
     db.set_classification(conn, cid, "AI", [], 0.1)
-    db.set_synthesis(conn, cid, "s")
+    db.set_synthesis(conn, cid, "t", "s", "summary", "long")
     assert db.exportable_clusters(conn, min_relevance=0.3) == []
 
 

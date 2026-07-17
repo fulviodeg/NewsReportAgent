@@ -164,10 +164,18 @@ def set_classification(
     conn.commit()
 
 
-def set_synthesis(conn: sqlite3.Connection, cluster_id: int, summary_it: str) -> None:
+def set_synthesis(
+    conn: sqlite3.Connection,
+    cluster_id: int,
+    title: str,
+    subtitle: str,
+    summary_it: str,
+    summary_long: str,
+) -> None:
     conn.execute(
-        "UPDATE clusters SET summary_it = ?, processed_at = ? WHERE id = ?",
-        (summary_it, utcnow_iso(), cluster_id),
+        "UPDATE clusters SET title = ?, subtitle = ?, summary_it = ?, summary_long = ?, "
+        "processed_at = ? WHERE id = ?",
+        (title, subtitle, summary_it, summary_long, utcnow_iso(), cluster_id),
     )
     conn.commit()
 

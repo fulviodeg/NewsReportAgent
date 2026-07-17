@@ -17,7 +17,10 @@ class Classification(BaseModel):
 
 
 class Synthesis(BaseModel):
-    summary_it: str = Field(min_length=1)
+    title: str = Field(min_length=1)          # concise Italian headline
+    subtitle: str = Field(min_length=1)       # one-line Italian standfirst
+    summary_it: str = Field(min_length=1)     # short description (card default)
+    summary_long: str = Field(min_length=1)   # deeper description (revealed by "Espandi")
     source_links: list[str] = Field(min_length=1)  # at least one preserved link
 
     @field_validator("source_links")

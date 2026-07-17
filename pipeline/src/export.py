@@ -54,7 +54,10 @@ def build_payload(conn: sqlite3.Connection, min_relevance: float) -> dict:
                 "theme": c["theme"],
                 "companies": story_companies,
                 "relevance": c["relevance"],
+                "title": c["title"],
+                "subtitle": c["subtitle"],
                 "summary_it": c["summary_it"],
+                "summary_long": c["summary_long"],
                 "processed_at": c["processed_at"],
                 "sources": sources,
             }

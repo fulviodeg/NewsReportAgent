@@ -22,33 +22,43 @@ def _members():
     ]
 
 
+_VALID = (
+    '{"title":"Titolo","subtitle":"Sottotitolo","summary_it":"Sintesi in italiano",'
+    '"summary_long":"Approfondimento esteso","source_links":["https://x/1"]}'
+)
+
+
 def test_valid_synthesis():
     tracker = CostTracker(0.0, 5.0)
-    llm = QueueLLM(
-        [('{"summary_it":"Sintesi in italiano","source_links":["https://x/1"]}', 0.002)]
-    )
+    llm = QueueLLM([(_VALID, 0.002)])
     s = synthesize_cluster(llm, tracker, "m", _members())
+    assert s.title == "Titolo"
+    assert s.subtitle == "Sottotitolo"
     assert s.summary_it == "Sintesi in italiano"
+    assert s.summary_long == "Approfondimento esteso"
     assert s.source_links == ["https://x/1"]
     assert tracker.run_cost == 0.002
 
 
 def test_missing_source_link_is_rejected():
     tracker = CostTracker(0.0, 5.0)
-    llm = QueueLLM([('{"summary_it":"s","source_links":[]}', 0.001)] * 3)
+    bad = '{"title":"T","subtitle":"S","summary_it":"s","summary_long":"l","source_links":[]}'
+    llm = QueueLLM([(bad, 0.001)] * 3)
     with pytest.raises(ItemProcessingError):
         synthesize_cluster(llm, tracker, "m", _members())
 
 
 def test_non_http_link_is_rejected():
     tracker = CostTracker(0.0, 5.0)
-    llm = QueueLLM([('{"summary_it":"s","source_links":["ftp://x/1"]}', 0.001)] * 3)
+    bad = '{"title":"T","subtitle":"S","summary_it":"s","summary_long":"l","source_links":["ftp://x/1"]}'
+    llm = QueueLLM([(bad, 0.001)] * 3)
     with pytest.raises(ItemProcessingError):
         synthesize_cluster(llm, tracker, "m", _members())
 
 
-def test_empty_summary_is_rejected():
+def test_missing_title_is_rejected():
     tracker = CostTracker(0.0, 5.0)
-    llm = QueueLLM([('{"summary_it":"","source_links":["https://x/1"]}', 0.001)] * 3)
+    bad = '{"subtitle":"S","summary_it":"s","summary_long":"l","source_links":["https://x/1"]}'
+    llm = QueueLLM([(bad, 0.001)] * 3)
     with pytest.raises(ItemProcessingError):
         synthesize_cluster(llm, tracker, "m", _members())

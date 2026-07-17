@@ -31,7 +31,10 @@ CREATE TABLE IF NOT EXISTS clusters (
     theme         TEXT,
     companies     TEXT,                  -- JSON array
     relevance     REAL,
-    summary_it    TEXT,                  -- Italian synthesis
+    title         TEXT,                  -- Italian headline (synthesis)
+    subtitle      TEXT,                  -- Italian standfirst (synthesis)
+    summary_it    TEXT,                  -- Italian short description
+    summary_long  TEXT,                  -- Italian deeper description ("Espandi")
     processed_at  TEXT
 );
 
