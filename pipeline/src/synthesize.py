@@ -26,8 +26,11 @@ def _messages(members: list[sqlite3.Row]) -> list[dict]:
     )
     links = [m["link"] for m in members if m["link"]]
     user = (
-        "Scrivi in italiano (termini tecnici in inglese) una scheda per questa notizia. "
-        "Conserva i link alle fonti. Restituisci JSON con esattamente questi campi:\n"
+        "Scrivi in italiano (termini tecnici in inglese) una scheda per questa notizia, "
+        "riportandola in modo diretto come farebbe una testata giornalistica. "
+        "NON usare frasi meta o autoreferenziali come 'questa notizia esplora', "
+        "'l'articolo descrive', 'la notizia riporta', 'il pezzo analizza': scrivi i fatti "
+        "direttamente. Conserva i link alle fonti. Restituisci JSON con esattamente questi campi:\n"
         '{"title": "titolo breve e incisivo", '
         '"subtitle": "sottotitolo di una riga che aggiunge contesto", '
         '"summary_it": "descrizione breve, 2-3 frasi", '

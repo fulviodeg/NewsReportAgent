@@ -1,4 +1,5 @@
-/* News Report Agent dashboard — palette #F7F7F7 #FFB22C #854836 #000000. */
+/* News Report Agent dashboard — base palette #F7F7F7 #FFB22C #854836 #000000,
+   plus per-theme accent colors applied inline by app.js (tab + tag share a color). */
 
 :root {
   --bg: #f7f7f7;
@@ -43,7 +44,7 @@ body {
 
 .topbar #search {
   flex: 1 1 auto;
-  max-width: 520px;
+  max-width: 460px;
   padding: 0.6rem 0.9rem;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -56,9 +57,25 @@ body {
   box-shadow: 0 0 0 3px rgba(255, 178, 44, 0.25);
 }
 
+.refresh-btn {
+  flex: 0 0 auto;
+  padding: 0.55rem 1rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--amber);
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 0.15s;
+}
+.refresh-btn:hover { filter: brightness(0.94); }
+.refresh-btn:disabled { opacity: 0.6; cursor: default; }
+
 .status { margin-left: auto; color: var(--muted); font-size: 0.78rem; white-space: nowrap; }
 
-/* --- theme tabs --- */
+/* --- theme tabs (per-tab color set inline by app.js) --- */
 .tabs {
   display: flex;
   gap: 0.5rem;
@@ -74,18 +91,12 @@ body {
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--card);
-  color: var(--brown);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition: filter 0.15s;
 }
-.tab:hover { border-color: var(--amber); }
-.tab.active {
-  background: var(--amber);
-  border-color: var(--amber);
-  color: var(--ink);
-}
+.tab:hover { filter: brightness(0.97); }
 
 /* --- secondary controls --- */
 .subcontrols {
@@ -103,20 +114,19 @@ body {
   color: var(--muted);
 }
 
-/* --- responsive multi-column grid --- */
+/* --- masonry layout: cards pack tightly, no vertical whitespace --- */
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.1rem;
-  max-width: 1400px;
+  columns: 340px;
+  column-gap: 1.1rem;
+  max-width: 1500px;
   margin: 0 auto;
   padding: 1.1rem 1.5rem 4rem;
 }
 
 /* --- card --- */
 .story {
-  display: flex;
-  flex-direction: column;
+  break-inside: avoid;
+  margin: 0 0 1.1rem;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 16px;
@@ -139,14 +149,13 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
-.chip.theme { background: var(--amber); color: var(--ink); }
+.chip.theme { color: #fff; }               /* background set inline per theme */
 .chip.company { background: #f3efec; color: var(--brown); }
 
 .title { margin: 0 0 0.3rem; font-size: 1.08rem; line-height: 1.3; font-weight: 800; letter-spacing: -0.01em; }
 .subtitle { margin: 0 0 0.6rem; color: var(--brown); font-size: 0.9rem; font-weight: 600; }
 .summary { margin: 0 0 0.5rem; line-height: 1.55; font-size: 0.92rem; color: #2a2a2a; }
 
-/* expandable deep description */
 .summary-long {
   margin: 0;
   max-height: 0;
@@ -157,11 +166,7 @@ body {
   color: #2a2a2a;
   transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.2s ease;
 }
-.story.expanded .summary-long {
-  max-height: 600px;
-  opacity: 1;
-  margin: 0 0 0.5rem;
-}
+.story.expanded .summary-long { max-height: 800px; opacity: 1; margin: 0 0 0.5rem; }
 
 .expand-btn {
   align-self: flex-start;
@@ -190,30 +195,31 @@ a.source.primary { font-weight: 700; }
 .other-sources { margin-top: 0.35rem; }
 .other-sources summary { cursor: pointer; color: var(--muted); font-size: 0.78rem; }
 
-/* explore-with-AI bar */
+/* explore-with-AI: label on top, three buttons always on one row */
 .explore {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: auto;
+  margin-top: 0.9rem;
   padding-top: 0.8rem;
   border-top: 1px solid var(--line);
 }
-.explore-label { font-size: 0.72rem; color: var(--muted); margin-right: 0.1rem; }
+.explore-label { display: block; font-size: 0.72rem; color: var(--muted); margin-bottom: 0.4rem; }
+.explore-btns { display: flex; gap: 0.4rem; }
 .explore-btn {
-  padding: 0.28rem 0.7rem;
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  padding: 0.3rem 0.4rem;
   border: 1px solid var(--brown);
   border-radius: 999px;
   color: var(--brown);
   text-decoration: none;
   font-size: 0.76rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 .explore-btn:hover { background: var(--brown); color: #fff; }
 
 @media (max-width: 640px) {
   .topbar { flex-wrap: wrap; }
   .status { width: 100%; margin: 0.2rem 0 0; }
-  .grid { padding: 1rem; gap: 0.9rem; }
+  .grid { padding: 1rem; column-gap: 0; }
 }
