@@ -47,6 +47,7 @@ class Clustering(BaseModel):
 
 class Filters(BaseModel):
     min_relevance: float
+    recent_days: int = 7  # main page shows only stories newer than this
 
 
 class Cost(BaseModel):

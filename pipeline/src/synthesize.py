@@ -42,6 +42,7 @@ def _messages(members: list[sqlite3.Row]) -> list[dict]:
         '"summary_it": "la notizia in breve, 2-3 frasi, fatti diretti", '
         '"summary_long": "la notizia estesa, 4-6 frasi con piu dettagli e contesto, '
         'sempre in stile diretto", '
+        '"entities": ["nomi propri citati: aziende, prodotti, persone"], '
         '"source_links": ["https://..."]}\n'
         f"Link delle fonti da conservare: {links}\n\n"
         f"Elementi della notizia:\n{stories}"

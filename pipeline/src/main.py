@@ -22,7 +22,7 @@ from .classify import classify_cluster
 from .cluster import cluster_items
 from .config import AppConfig, Source, load_config, load_secrets
 from .embeddings import EmbeddingsProvider, OpenAICompatibleEmbeddings
-from .export import export_json
+from .export import export_dashboard
 from .ingest.base import IngestSource
 from .ingest.imap_source import ImapSource
 from .llm import (
@@ -165,6 +165,7 @@ def run_processing(
                 result.subtitle,
                 result.summary_it,
                 result.summary_long,
+                result.entities,
             )
             counts["synthesized"] += 1
             consecutive = 0
@@ -177,7 +178,11 @@ def run_processing(
         log.error("run aborted: %s", exc)
 
     try:
-        counts["exported"] = export_json(conn, config.filters.min_relevance, out_path)
+        exported = export_dashboard(
+            conn, config.filters.min_relevance, config.filters.recent_days, out_path
+        )
+        counts["exported"] = exported["recent"]
+        counts["archived"] = exported["archive"]
     except Exception as exc:  # export must never crash the run record
         log.error("export failed: %s", exc)
 

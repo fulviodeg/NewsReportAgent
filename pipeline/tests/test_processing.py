@@ -39,7 +39,8 @@ class ScriptedLLM:
             return LLMResult('{"title":"x","subtitle":"y","summary_it":"z","summary_long":"w","source_links":[]}', 0.001)  # invalid
         return LLMResult(
             '{"title":"Nuovo chip","subtitle":"Contesto","summary_it":"Sintesi breve",'
-            '"summary_long":"Approfondimento esteso con English terms","source_links":["https://a/1"]}',
+            '"summary_long":"Approfondimento esteso con English terms","entities":["Acme"],'
+            '"source_links":["https://a/1"]}',
             0.001,
         )
 
@@ -79,6 +80,7 @@ def test_processing_end_to_end_with_per_item_isolation(tmp_path):
     assert story["title"] == "Nuovo chip"
     assert story["subtitle"]
     assert story["summary_long"]
+    assert story["entities"] == ["Acme"]
     assert {s["testata"] for s in story["sources"]} == {"Testata A", "Testata B"}
     assert data["themes"] == ["AI"]
 

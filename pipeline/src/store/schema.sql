@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS clusters (
     title         TEXT,                  -- Italian headline (synthesis)
     subtitle      TEXT,                  -- Italian standfirst (synthesis)
     summary_it    TEXT,                  -- Italian short description
-    summary_long  TEXT,                  -- Italian deeper description ("Espandi")
+    summary_long  TEXT,                  -- Italian deeper description ("View more")
+    entities      TEXT,                  -- JSON array of proper nouns to highlight
     processed_at  TEXT
 );
 

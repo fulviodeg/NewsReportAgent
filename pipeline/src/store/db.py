@@ -171,11 +171,20 @@ def set_synthesis(
     subtitle: str,
     summary_it: str,
     summary_long: str,
+    entities: Optional[list[str]] = None,
 ) -> None:
     conn.execute(
         "UPDATE clusters SET title = ?, subtitle = ?, summary_it = ?, summary_long = ?, "
-        "processed_at = ? WHERE id = ?",
-        (title, subtitle, summary_it, summary_long, utcnow_iso(), cluster_id),
+        "entities = ?, processed_at = ? WHERE id = ?",
+        (
+            title,
+            subtitle,
+            summary_it,
+            summary_long,
+            json.dumps(entities or []),
+            utcnow_iso(),
+            cluster_id,
+        ),
     )
     conn.commit()
 

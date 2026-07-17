@@ -13,6 +13,7 @@ import json
 import os
 import sqlite3
 import tempfile
+from datetime import datetime, timedelta, timezone
 
 from .store import db
 
@@ -32,15 +33,24 @@ def _atomic_write(path: str, text: str) -> None:
         raise
 
 
-def build_payload(conn: sqlite3.Connection, min_relevance: float) -> dict:
+def build_payload(conn: sqlite3.Connection, min_relevance: float, since_days=None) -> dict:
     themes: set[str] = set()
     companies: set[str] = set()
     testate: set[str] = set()
     stories = []
 
+    cutoff = None
+    if since_days is not None:
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=since_days)).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+
     for c in db.exportable_clusters(conn, min_relevance):
+        if cutoff and (c["processed_at"] or "") < cutoff:
+            continue
         members = db.get_items_by_ids(conn, json.loads(c["member_ids"]))
         story_companies = json.loads(c["companies"]) if c["companies"] else []
+        entities = json.loads(c["entities"]) if c["entities"] else []
         sources = [
             {"testata": m["source_name"], "title": m["title"], "link": m["link"]}
             for m in members
@@ -53,6 +63,7 @@ def build_payload(conn: sqlite3.Connection, min_relevance: float) -> dict:
                 "id": c["id"],
                 "theme": c["theme"],
                 "companies": story_companies,
+                "entities": entities,
                 "relevance": c["relevance"],
                 "title": c["title"],
                 "subtitle": c["subtitle"],
@@ -72,8 +83,20 @@ def build_payload(conn: sqlite3.Connection, min_relevance: float) -> dict:
     }
 
 
-def export_json(conn: sqlite3.Connection, min_relevance: float, out_path: str) -> int:
-    """Write the exportable stories to out_path atomically. Returns the story count."""
-    payload = build_payload(conn, min_relevance)
+def export_json(
+    conn: sqlite3.Connection, min_relevance: float, out_path: str, since_days=None
+) -> int:
+    """Write exportable stories to out_path atomically. Returns the story count."""
+    payload = build_payload(conn, min_relevance, since_days=since_days)
     _atomic_write(out_path, json.dumps(payload, ensure_ascii=False, indent=2))
     return len(payload["stories"])
+
+
+def export_dashboard(
+    conn: sqlite3.Connection, min_relevance: float, recent_days: int, out_path: str
+) -> dict:
+    """Write both the recent feed (out_path) and the full archive (archive.json sibling)."""
+    recent = export_json(conn, min_relevance, out_path, since_days=recent_days)
+    archive_path = os.path.join(os.path.dirname(out_path) or ".", "archive.json")
+    archive = export_json(conn, min_relevance, archive_path, since_days=None)
+    return {"recent": recent, "archive": archive}

@@ -29,6 +29,7 @@ window_hours = 72
 
 [filters]
 min_relevance = 0.3
+recent_days = 7   # main dashboard shows only the last N days; archive keeps everything
 
 [cost]
 daily_usd_cap = 5.0

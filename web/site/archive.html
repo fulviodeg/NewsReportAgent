@@ -3,15 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>News Report Agent</title>
+  <title>Archivio — News Report Agent</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body data-page="main">
+<body data-page="archive">
   <header class="topbar">
-    <div class="brand">News&nbsp;Report&nbsp;<span>Agent</span></div>
-    <input type="search" id="search" placeholder="Cerca notizie, aziende, fonti…" />
-    <button id="refresh-btn" class="refresh-btn" type="button">↻ Verifica nuove notizie</button>
-    <a class="nav-btn" href="archive.html">Archivio</a>
+    <div class="brand">Archivio</div>
+    <input type="search" id="search" placeholder="Cerca nell'archivio…" />
+    <a class="nav-btn" href="index.html">← Ultime notizie</a>
     <span id="status" class="status"></span>
   </header>
 
@@ -21,6 +20,9 @@
   </nav>
 
   <main id="stories" class="grid"></main>
+  <div class="load-more-wrap">
+    <button id="load-more" class="load-more" type="button">Carica altre</button>
+  </div>
 
   <script src="app.js"></script>
 </body>

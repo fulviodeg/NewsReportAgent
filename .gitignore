@@ -10,6 +10,7 @@ web/.htpasswd
 
 # Local demo output served by the dashboard
 web/site/export.json
+web/site/archive.json
 
 # Python
 __pycache__/
