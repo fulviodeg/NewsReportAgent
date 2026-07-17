@@ -1,0 +1,30 @@
+# News Report Agent — pipeline configuration (illustrative values).
+# Secrets are NOT here; they come from environment variables (see .env.example).
+# See docs/v1-architecture.md (Section 6) for the meaning of each key.
+
+[cadence]
+collection_interval_minutes = 5
+processing_interval_minutes = 360   # every 6 hours
+
+[llm]
+provider = "openrouter"
+model_classify = "TBD-model"        # live decision; one model in v1
+model_synthesize = "TBD-model"      # same model in v1, separable later
+
+[embeddings]
+provider = "TBD"                    # live decision: hosted vs local (docs §7)
+model = "TBD"
+
+[clustering]
+similarity_threshold = 0.82
+window_hours = 72
+
+[filters]
+min_relevance = 0.3
+
+[cost]
+daily_usd_cap = 5.0
+
+[[sources]]
+name = "Example Testata"
+from_address = "news@example.com"

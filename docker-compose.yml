@@ -1,0 +1,28 @@
+# News Report Agent — v1 (scaffold)
+#
+# Two services sharing one volume, as specified in docs/v1-architecture.md (Section 10).
+# This is a LIGHT SCAFFOLD: service definitions are minimal and the pipeline code is stubbed.
+
+services:
+  pipeline:
+    build: ./pipeline
+    env_file: .env
+    volumes:
+      - shared:/data
+    restart: unless-stopped
+
+  web:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./web/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./web/site:/usr/share/nginx/html:ro
+      - ./web/.htpasswd:/etc/nginx/.htpasswd:ro
+      - shared:/data:ro
+    depends_on:
+      - pipeline
+    restart: unless-stopped
+
+volumes:
+  shared:
