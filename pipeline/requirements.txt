@@ -1,10 +1,10 @@
 # News Report Agent — pipeline dependencies.
-# Pinning is deferred until the open decisions (docs/build-prompt.md) are made.
-# Standard library covers IMAP (imaplib), email parsing (email), and SQLite (sqlite3).
+# The container runs Python 3.12, so tomllib is stdlib (no tomli needed there).
+# Standard library also covers IMAP (imaplib), email parsing (email), and SQLite (sqlite3).
 
 pydantic>=2          # structured, validated LLM output
 httpx>=0.27          # OpenRouter / embeddings HTTP calls
-# tomllib is stdlib on Python 3.11+ (config loading)
+beautifulsoup4>=4.12 # robust HTML parsing of newsletter emails
 
 # Dev / test
 pytest>=8

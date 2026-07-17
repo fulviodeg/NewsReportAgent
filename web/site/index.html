@@ -9,11 +9,15 @@
 <body>
   <header>
     <h1>News Report Agent</h1>
-    <!-- TODO: filters (theme, company, testata) + search box -->
+    <div class="controls">
+      <input type="search" id="search" placeholder="Cerca…" />
+      <select id="filter-theme"><option value="">Tutti i temi</option></select>
+      <select id="filter-company"><option value="">Tutte le aziende</option></select>
+      <select id="filter-testata"><option value="">Tutte le testate</option></select>
+    </div>
+    <p id="status" class="status"></p>
   </header>
-  <main id="stories">
-    <!-- Stories rendered client-side from /export.json -->
-  </main>
+  <main id="stories"></main>
   <script src="app.js"></script>
 </body>
 </html>

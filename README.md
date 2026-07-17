@@ -3,8 +3,9 @@
 Ingests news from newsletters (IMAP), classifies and synthesizes each story with an LLM,
 and publishes a filterable, password-protected static dashboard.
 
-**Status:** light scaffold. Directory structure, config, and the two swap interfaces
-(`IngestSource`, embeddings) are in place; the pipeline logic is stubbed (`NotImplementedError`).
+**Status:** v1 implemented. Fixed pipeline (collect → parse → cluster → classify →
+synthesize → export) plus a static dashboard. 51 offline tests pass; real LLM/embeddings
+end-to-end verification happens on the VPS. See [docs/v1-architecture.md](docs/v1-architecture.md) §9 for the Definition of Done.
 
 ## Documentation
 
@@ -23,16 +24,42 @@ data/                shared runtime volume (SQLite + export.json) — gitignored
 docker-compose.yml   two services: pipeline + web
 ```
 
-## Setup
+## Setup (development)
 
 1. `cp .env.example .env` and fill in the values (never commit `.env`).
-2. Pick the open decisions in [docs/build-prompt.md](docs/build-prompt.md): OpenRouter model,
-   embeddings approach, config format.
-3. Implement the stubs, then `docker compose up`.
+2. The open decisions in [docs/build-prompt.md](docs/build-prompt.md) are set in
+   `pipeline/config.toml` (OpenRouter model, embeddings provider/model/endpoint, themes).
+3. Run the offline test suite (no network needed):
+   ```bash
+   python -m venv .venv && . .venv/bin/activate
+   pip install -r pipeline/requirements.txt tomli   # tomli only for Python < 3.11
+   cd pipeline && python -m pytest
+   ```
+
+## Deploy (VPS, Docker Compose)
+
+Two services share one volume; the pipeline writes `news.db` + `export.json`, nginx serves
+them read-only. Data lives at `/data` inside the containers (`DATA_DIR`, default `/data`).
+
+1. `cp .env.example .env` and fill in real secrets (OpenRouter key, IMAP creds, embeddings
+   key, dashboard user/password).
+2. Generate the nginx basic-auth file from the env (never committed):
+   ```bash
+   set -a && . ./.env && set +a
+   printf "%s:%s\n" "$DASHBOARD_USER" "$(openssl passwd -apr1 "$DASHBOARD_PASSWORD")" > web/.htpasswd
+   ```
+3. `docker compose up -d --build`
+4. Open `http://<host>:8080` — the dashboard is behind HTTP basic auth.
+5. Trigger a processing run on demand (same code path as the scheduled clock):
+   ```bash
+   docker compose exec pipeline python -m src.main run-processing
+   ```
+
+CLI commands inside the container: `python -m src.main` (scheduler / two clocks),
+`run-collection`, `run-processing`.
 
 ## Note on restricted networks
 
-OpenRouter (the LLM provider) may be unreachable from corporate/restricted networks.
-The LLM lives behind `pipeline/src/llm.py`; for offline development a fake client can be
-swapped in behind the same code path so the deterministic stages can be tested without
-network access.
+OpenRouter (LLM) and the embeddings API may be unreachable from corporate/restricted
+networks. The dev machine only builds and pushes; the whole test suite runs offline via
+mocks/fakes. Real end-to-end LLM/embeddings calls happen on the VPS at runtime.
