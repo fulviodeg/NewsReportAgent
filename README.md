@@ -24,6 +24,29 @@ data/                shared runtime volume (SQLite + export.json) — gitignored
 docker-compose.yml   two services: pipeline + web
 ```
 
+## Try it locally (no VPS, no Docker)
+
+Run the whole pipeline against sample newsletters and open the dashboard in your browser.
+
+```bash
+python -m venv .venv && . .venv/bin/activate
+pip install -r pipeline/requirements.txt tomli   # tomli only for Python < 3.11
+
+cd pipeline
+python local_demo.py            # OFFLINE: fake embeddings + fake LLM (no keys/network)
+# or:
+python local_demo.py --real     # REAL: OpenRouter + embeddings from ../.env (needs keys)
+
+cd ../web/site && python -m http.server 8000
+# open http://localhost:8000
+```
+
+`local_demo.py` ingests the `.eml` files in [demo/newsletters/](demo/newsletters/) (drop your
+own real newsletter exports there to test parsing), runs collect → cluster → classify →
+synthesize → export, and writes `web/site/export.json` for the dashboard. Offline mode uses
+deterministic stand-ins so you can explore the UI and flow without any API key; `--real`
+exercises the actual APIs end-to-end.
+
 ## Setup (development)
 
 1. `cp .env.example .env` and fill in the values (never commit `.env`).

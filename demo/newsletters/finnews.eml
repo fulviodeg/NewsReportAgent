@@ -1,0 +1,13 @@
+From: Fin News <news@finnews.com>
+Subject: Fin News Daily
+Content-Type: text/html; charset="utf-8"
+MIME-Version: 1.0
+
+<html><body>
+  <h1>Fin News</h1>
+  <div class="item">
+    <a href="https://finnews.com/ecb-rates">ECB raises interest rates again</a>
+    <p>The European Central Bank raised interest rates, citing persistent inflation across
+    the euro area and its impact on banks and payments.</p>
+  </div>
+</body></html>

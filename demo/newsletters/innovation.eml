@@ -1,0 +1,17 @@
+From: Innovation Weekly <news@innovation.com>
+Subject: Innovation Weekly
+Content-Type: text/html; charset="utf-8"
+MIME-Version: 1.0
+
+<html><body>
+  <h1>Innovation Weekly</h1>
+  <div class="item">
+    <a href="https://innovation.com/apple-new-processor">Apple's new M5 processor targets on-device AI</a>
+    <p>Apple has revealed the M5 chip, a new Apple processor built for on-device AI and
+    machine learning gains across Mac and iPad.</p>
+  </div>
+  <div class="item">
+    <a href="https://innovation.com/startup-seed">Robotics startup raises a seed round</a>
+    <p>A robotics startup closed a seed funding round to expand its engineering team.</p>
+  </div>
+</body></html>
