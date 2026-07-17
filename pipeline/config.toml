@@ -16,10 +16,11 @@ backoff_base_seconds = 1.0          # exponential backoff base
 max_consecutive_failures = 5        # circuit breaker: abort run after N in a row
 
 [embeddings]
-# Generic OpenAI-compatible provider: set provider/model/endpoint at deploy.
-provider = "openai"
-model = "text-embedding-3-small"
-endpoint = "https://api.openai.com/v1/embeddings"
+# OpenRouter also serves an OpenAI-compatible /embeddings endpoint, so one key covers
+# both LLM and embeddings. Swap provider/model/endpoint here to use a different vendor.
+provider = "openrouter"
+model = "openai/text-embedding-3-small"
+endpoint = "https://openrouter.ai/api/v1/embeddings"
 
 [clustering]
 similarity_threshold = 0.82
