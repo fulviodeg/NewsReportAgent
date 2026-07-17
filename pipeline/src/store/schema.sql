@@ -18,6 +18,13 @@ CREATE TABLE IF NOT EXISTS items (
     collected_at  TEXT NOT NULL          -- ISO-8601 timestamp
 );
 
+-- Persisted embedding vectors so re-runs never re-embed (cost + idempotency).
+CREATE TABLE IF NOT EXISTS embeddings (
+    item_id INTEGER PRIMARY KEY REFERENCES items(id),
+    model   TEXT NOT NULL,
+    vector  TEXT NOT NULL          -- JSON array of floats (unit-normalized)
+);
+
 CREATE TABLE IF NOT EXISTS clusters (
     id            INTEGER PRIMARY KEY,
     member_ids    TEXT,                  -- JSON array of item ids
