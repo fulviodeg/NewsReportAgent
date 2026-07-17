@@ -9,9 +9,27 @@ end-to-end verification happens on the VPS. See [docs/v1-architecture.md](docs/v
 
 ## Documentation
 
-- **Architecture & Definition of Done:** [docs/v1-architecture.md](docs/v1-architecture.md)
+- **Architecture diagrams (interactive):** https://fulviodeg.github.io/NewsReportAgent/ — generated from the LikeC4 model, auto-published on every push.
+- **Architecture diagrams (inline):** [docs/diagrams.md](docs/diagrams.md) — Mermaid, rendered on GitHub.
+- **Architecture model (source of truth):** [docs/architecture/](docs/architecture/) — LikeC4 `.c4` files.
+- **Design spec & Definition of Done:** [docs/v1-architecture.md](docs/v1-architecture.md)
 - **Build task & locked/open decisions:** [docs/build-prompt.md](docs/build-prompt.md)
 - **Coding-agent rules:** [CLAUDE.md](CLAUDE.md)
+
+### Updating the architecture docs
+
+The diagrams are architecture-as-code (LikeC4). To change them, edit the model and regenerate:
+
+```bash
+npm install                # once; installs likec4
+npm run docs:serve         # live interactive preview while editing docs/architecture/*.c4
+# edit docs/architecture/{specification,model,views}.c4
+npm run docs:validate      # check the model
+npm run docs:mermaid       # regenerate docs/diagrams.md
+```
+
+CI (`.github/workflows/docs.yml`) validates the model, fails if `docs/diagrams.md` is out of
+date, and deploys the interactive site to GitHub Pages on push to `main`.
 
 ## Layout
 

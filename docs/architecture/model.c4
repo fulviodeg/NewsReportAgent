@@ -1,0 +1,92 @@
+// LikeC4 model — elements and relationships. Mirrors pipeline/src/ and the runtime.
+
+model {
+  reader = person 'Lettore' {
+    description 'Apre la dashboard, filtra e cerca le notizie'
+  }
+
+  mailbox = external 'Mailbox dedicata' {
+    description 'Casella IMAP con le newsletter'
+  }
+  openrouter = external 'OpenRouter' {
+    description 'LLM (classify + synthesize) ed embeddings, via HTTPS'
+  }
+  github = external 'GitHub' {
+    description 'Sorgente del codice; GitHub Pages ospita la documentazione'
+  }
+
+  nra = system 'News Report Agent' {
+    description 'Ingesta newsletter, classifica e sintetizza con LLM, pubblica una dashboard'
+
+    pipeline = container 'Pipeline' {
+      description 'Workflow fisso a due clock; nessun LLM orchestratore a runtime'
+      technology 'Python, Docker'
+
+      config = component 'Config' {
+        description 'Carica e valida config.toml; secrets da environment'
+      }
+      scheduler = component 'Scheduler' {
+        description 'main.py: due clock (collection/processing) + trigger on-demand (CLI)'
+      }
+      ingest = component 'Ingest' {
+        description 'IngestSource -> ImapSource (IMAP, stdlib)'
+      }
+      parse = component 'Parse' {
+        description 'HTML -> item con BeautifulSoup; hint per-sender'
+      }
+      embeddings = component 'Embeddings' {
+        description 'EmbeddingsProvider -> OpenAICompatibleEmbeddings (batch)'
+      }
+      cluster = component 'Cluster' {
+        description 'Dedup (content hash) + clustering cosine per storia'
+      }
+      llm = component 'LLM client' {
+        description 'OpenRouter: retry/backoff, cost cap, JSON robusto'
+      }
+      classify = component 'Classify' {
+        description 'Tema, aziende, relevance (Pydantic, retry-then-skip)'
+      }
+      synthesize = component 'Synthesize' {
+        description 'Titolo/sottotitolo/sintesi IT + entities (Pydantic)'
+      }
+      export = component 'Export' {
+        description 'export.json (ultimi 7gg) + archive.json (tutto), scrittura atomica'
+      }
+      db = component 'Store access' {
+        description 'store/db.py: SQLite (WAL, insert idempotenti, runs)'
+      }
+
+      scheduler -> ingest 'collection clock'
+      scheduler -> cluster 'processing clock'
+      ingest -> parse 'messaggi grezzi'
+      parse -> db 'salva item'
+      cluster -> embeddings 'embed nuovi item'
+      cluster -> db 'legge item, scrive cluster'
+      cluster -> classify 'cluster'
+      classify -> llm 'chat completion'
+      classify -> synthesize 'cluster classificato'
+      synthesize -> llm 'chat completion'
+      synthesize -> export 'storie pronte'
+      export -> db 'legge storie'
+      config -> scheduler 'cadenze, soglie, model'
+    }
+
+    web = container 'Dashboard' {
+      description 'Sito statico: tab per tema, ricerca, archivio, Esplora con AI'
+      technology 'nginx + HTTP basic auth, JS vanilla'
+    }
+
+    store = container 'Store' {
+      description 'Single source of truth su volume condiviso'
+      technology 'SQLite + export.json / archive.json'
+    }
+  }
+
+  // container / system level relationships
+  reader -> web 'apre nel browser (basic auth)'
+  pipeline -> mailbox 'poll IMAP dei nuovi messaggi'
+  pipeline -> openrouter 'classify + synthesize + embeddings'
+  pipeline -> store 'scrive item, cluster, JSON'
+  web -> store 'legge export.json / archive.json'
+  github -> web 'GitHub Pages serve i diagrammi'
+}

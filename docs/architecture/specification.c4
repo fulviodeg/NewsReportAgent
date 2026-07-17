@@ -1,0 +1,33 @@
+// LikeC4 specification — element and relationship kinds + styles.
+// See https://likec4.dev. Single source of truth for the architecture diagrams.
+
+specification {
+  element person {
+    style {
+      shape person
+      color secondary
+    }
+  }
+  element system {
+    style {
+      color primary
+    }
+  }
+  element external {
+    style {
+      color muted
+    }
+  }
+  element container {
+    style {
+      color primary
+    }
+  }
+  element component {
+    style {
+      color sky
+    }
+  }
+
+  relationship async
+}

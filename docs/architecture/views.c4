@@ -1,0 +1,39 @@
+// LikeC4 views — projections of the model. Editing the model updates all views.
+// Nested elements are referenced by qualified path (nra.pipeline.<component>).
+
+views {
+  view index {
+    title 'Contesto — News Report Agent'
+    include *
+  }
+
+  view containers of nra {
+    title 'Container'
+    include *
+  }
+
+  view components of nra.pipeline {
+    title 'Componenti della Pipeline'
+    include *
+  }
+
+  dynamic view collectionClock {
+    title 'Collection clock (frequente, senza LLM)'
+    nra.pipeline.scheduler -> nra.pipeline.ingest 'ogni N minuti (config)'
+    nra.pipeline.ingest -> nra.pipeline.parse 'messaggi grezzi'
+    nra.pipeline.parse -> nra.pipeline.db 'item (dedup per content hash)'
+  }
+
+  dynamic view processingClock {
+    title 'Processing clock (LLM) + on-demand'
+    nra.pipeline.scheduler -> nra.pipeline.cluster 'ogni N ore / on-demand'
+    nra.pipeline.cluster -> nra.pipeline.embeddings 'embed nuovi item'
+    nra.pipeline.cluster -> nra.pipeline.db 'crea cluster'
+    nra.pipeline.cluster -> nra.pipeline.classify 'per cluster'
+    nra.pipeline.classify -> nra.pipeline.llm 'tema, aziende, relevance'
+    nra.pipeline.classify -> nra.pipeline.synthesize 'cluster classificato'
+    nra.pipeline.synthesize -> nra.pipeline.llm 'sintesi IT + entities'
+    nra.pipeline.synthesize -> nra.pipeline.export 'storie pronte'
+    nra.pipeline.export -> nra.store 'export.json + archive.json (atomico)'
+  }
+}

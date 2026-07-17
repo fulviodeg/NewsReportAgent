@@ -106,6 +106,7 @@ Define success criteria, then loop until they are verifiably met, then stop.
 ### Conventions
 - **Code and comments:** English.
 - **The news output the system produces:** Italian, with technical terms left in English. Always preserve source links. Show the other sources reporting the same story (this comes from the clustering step). These are runtime output rules; the codebase itself stays in English.
+- **Architecture docs:** the architecture is documented as code with LikeC4 in `docs/architecture/*.c4` (single source of truth), rendered to `docs/diagrams.md` (Mermaid) and an interactive GitHub Pages site. When a change alters the architecture (containers, components, or their relationships), update the `.c4` model and run `npm run docs:mermaid` in the same change. CI validates the model and fails if `docs/diagrams.md` is stale.
 
 ---
 

@@ -1,0 +1,56 @@
+name: docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Validate LikeC4 model
+        run: npx likec4 validate docs/architecture
+      - name: Check formatting
+        run: npx likec4 format --check docs/architecture
+      - name: Regenerate Mermaid and fail on drift
+        run: |
+          npm run docs:mermaid
+          git diff --exit-code docs/diagrams.md \
+            || (echo "::error::docs/diagrams.md is out of date — run 'npm run docs:mermaid' and commit" && exit 1)
+
+  deploy:
+    # Publish the interactive LikeC4 site to GitHub Pages (public repo).
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Build static site
+        run: npx likec4 build docs/architecture -o dist --base /NewsReportAgent/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

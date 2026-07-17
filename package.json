@@ -1,0 +1,15 @@
+{
+  "name": "newsreportagent-docs",
+  "private": true,
+  "description": "LikeC4 architecture documentation for News Report Agent",
+  "scripts": {
+    "docs:serve": "likec4 serve docs/architecture",
+    "docs:validate": "likec4 validate docs/architecture",
+    "docs:fmt": "likec4 format docs/architecture",
+    "docs:mermaid": "node scripts/gen_diagrams.mjs",
+    "docs:build": "likec4 build docs/architecture -o dist --base /NewsReportAgent/"
+  },
+  "devDependencies": {
+    "likec4": "^1"
+  }
+}

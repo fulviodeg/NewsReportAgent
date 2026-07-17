@@ -26,3 +26,8 @@ venv/
 .DS_Store
 .idea/
 .vscode/
+
+# Node / LikeC4 docs tooling
+node_modules/
+dist/
+docs/.diagrams_tmp/
