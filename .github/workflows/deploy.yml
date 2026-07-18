@@ -1,0 +1,52 @@
+name: deploy
+
+# Continuous Deployment with a MANUAL APPROVAL gate.
+#
+# Trigger: every push to main (or a manual "Run workflow").
+# Gate:    this job targets the `production` environment. Configure that
+#          environment in GitHub (Settings -> Environments -> production)
+#          with yourself as a *required reviewer*. The run then pauses on
+#          "Waiting for approval" and nothing touches the VPS until you click
+#          Approve. See README "Deploy" section for the one-time setup.
+#
+# Strategy: build-on-VPS. The runner only SSHes in and runs
+#           `git pull && docker compose up -d --build` — the VPS builds the
+#           image itself (matches docker-compose.yml `build: ./pipeline`).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy to VPS over SSH
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+          PORT="${SSH_PORT:-22}"
+          TARGET="${DEPLOY_PATH:-/opt/NewsReportAgent}"
+
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -p "$PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+          ssh -i ~/.ssh/id_deploy -p "$PORT" -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$SSH_HOST" \
+            "set -euo pipefail && cd '$TARGET' && git pull --ff-only && docker compose up -d --build && docker compose ps"
