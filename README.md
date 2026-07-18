@@ -99,7 +99,48 @@ them read-only. Data lives at `/data` inside the containers (`DATA_DIR`, default
 CLI commands inside the container: `python -m src.main` (scheduler / two clocks),
 `run-collection`, `run-processing`.
 
+## Automated deploy (GitHub Actions, manual approval)
+
+Push-to-deploy with a human gate: every push to `main` starts the [`deploy`
+workflow](.github/workflows/deploy.yml), which **pauses for your approval** before
+touching the VPS. On approval, a GitHub runner SSHes into the VPS and runs
+`git pull && docker compose up -d --build` (the VPS builds the image itself).
+
+**One-time setup** (run from a machine that *can* SSH to the VPS — a corporate
+laptop may block outbound SSH):
+
+1. **Clone the repo on the VPS** and create its `.env` + `.htpasswd` (steps 1–2 of
+   the manual deploy above):
+   ```bash
+   ssh root@<host>
+   git clone https://github.com/fulviodeg/NewsReportAgent.git /opt/NewsReportAgent
+   cd /opt/NewsReportAgent
+   cp .env.example .env   # then fill in real secrets
+   set -a && . ./.env && set +a
+   printf "%s:%s\n" "$DASHBOARD_USER" "$(openssl passwd -apr1 "$DASHBOARD_PASSWORD")" > web/.htpasswd
+   ```
+2. **Create a dedicated deploy key** (separate from your personal key) and authorize
+   it on the VPS:
+   ```bash
+   ssh-keygen -t ed25519 -f deploy_key -N "" -C "github-deploy"
+   ssh-copy-id -i deploy_key.pub root@<host>   # or append deploy_key.pub to ~/.ssh/authorized_keys
+   ```
+3. **Add GitHub repo secrets** (Settings → Secrets and variables → Actions):
+   - `SSH_HOST` — VPS IP/hostname
+   - `SSH_USER` — `root`
+   - `SSH_KEY` — the **private** key (contents of `deploy_key`)
+   - `SSH_PORT` — optional, defaults to `22`
+   - `DEPLOY_PATH` — optional, defaults to `/opt/NewsReportAgent`
+4. **Create the approval gate** (Settings → Environments → New environment →
+   `production`) and add yourself under **Required reviewers**. This is what makes the
+   deploy wait for your click.
+
+**Deploying:** push to `main` (or run the workflow manually from the Actions tab).
+The run stops at *Waiting for approval* → review it → **Approve**. Nothing reaches the
+VPS until then. `WEB_PORT` in the VPS `.env` controls the published port (default 8080).
+
 ## Note on restricted networks
+
 
 OpenRouter (LLM) and the embeddings API may be unreachable from corporate/restricted
 networks. The dev machine only builds and pushes; the whole test suite runs offline via
