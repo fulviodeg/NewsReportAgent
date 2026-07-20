@@ -26,6 +26,7 @@ def _atomic_write(path: str, text: str) -> None:
             fh.write(text)
             fh.flush()
             os.fsync(fh.fileno())
+        os.chmod(tmp, 0o644)  # readable by nginx container
         os.replace(tmp, path)
     except Exception:
         if os.path.exists(tmp):
