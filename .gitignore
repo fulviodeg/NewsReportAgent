@@ -26,6 +26,7 @@ venv/
 .DS_Store
 .idea/
 .vscode/
+.claude/
 
 # Node / LikeC4 docs tooling
 node_modules/

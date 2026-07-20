@@ -52,3 +52,27 @@ from_address = "newsletter@internazionale.it"
 # Editorial format (Mailchimp, inline links) — the generic splitter over-extracts here.
 # Best treated as a single item; a per-sender "whole email" mode is a future refinement.
 
+[[sources]]
+name = "Superhuman"
+from_address = "superhuman@mail.joinsuperhuman.ai"
+
+[[sources]]
+name = "TAAFT"
+from_address = "hi@mail.theresanaiforthat.com"
+
+[[sources]]
+name = "AI Academy"
+from_address = "noreply@skool.com"
+
+[[sources]]
+name = "Il Sole 24 Ore"
+from_address = "24ore.com@ilsole24ore.com"
+
+[[sources]]
+name = "RCS Mediagroup"
+from_address = "noreply@information.rcsmediagroup.it"
+
+[[sources]]
+name = "Midland Europe"
+from_address = "midlandnewsletter@midlandeurope.com"
+
