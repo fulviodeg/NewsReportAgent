@@ -9,8 +9,8 @@ processing_interval_minutes = 360   # every 6 hours
 [llm]
 provider = "openrouter"
 endpoint = "https://openrouter.ai/api/v1/chat/completions"
-model_classify = "google/gemini-2.5-flash"     # live decision; verify on VPS
-model_synthesize = "google/gemini-2.5-flash"    # same model in v1, separable later
+model_classify = "google/gemma-4-31b-it:free"     # free, multilingual, good JSON
+model_synthesize = "google/gemma-4-31b-it:free"  # free, 140+ languages, ottimo italiano
 max_retries = 4                     # bounded retries on transient errors
 backoff_base_seconds = 1.0          # exponential backoff base
 max_consecutive_failures = 5        # circuit breaker: abort run after N in a row
